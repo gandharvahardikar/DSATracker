@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Problem Tracker</title>
+    <!-- Import a premium font for a cleaner look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Core Colors */
+            --primary: #188038; /* Google Sheets Green */
+            --primary-hover: #146c2e;
+            --bg-body: #f3f4f6;
+            --bg-surface: #ffffff;
+            
+            /* Text & Borders */
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+            --border-dark: #d1d5db;
+            
+            /* Input styling */
+            --input-hover: #f9fafb;
+            --input-focus-ring: rgba(24, 128, 56, 0.2);
+        }
+
+        /* Base Reset & Typography */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Custom Scrollbar for a sleek feel */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* --- Header Section --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-box {
+            background: var(--primary);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(24, 128, 56, 0.2);
+        }
+
+        .header-title h1 { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            letter-spacing: -0.01em;
+        }
+        
+        .header-title p { 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            font-weight: 600;
+            margin-top: 2px; 
+        }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 12px; }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-secondary {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-dark);
+            color: var(--text-main);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn-secondary:hover { background: #f9fafb; border-color: #9ca3af; }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(24, 128, 56, 0.2);
+        }
+        .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 6px rgba(24, 128, 56, 0.3); }
+
+        /* --- Table Section --- */
+        .table-container {
+            background: var(--bg-surface);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            overflow: hidden;
+        }
+
+        .table-header-bar {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.02em;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            max-height: calc(100vh - 250px); /* Smart height to keep it on screen */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-dark);
+            border-right: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        th:last-child { border-right: none; }
+
+        td {
+            border-bottom: 1px solid var(--border-light);
+            border-right: 1px solid var(--border-light);
+            padding: 4px; /* Padding creates space for the focus ring on inputs */
+            position: relative;
+            background-color: var(--bg-surface);
+            transition: background-color 0.15s ease;
+        }
+        td:last-child { border-right: none; }
+        
+        /* Subtle row hover */
+        tr:hover td { background-color: #f8fafc; }
+
+        .cell-number {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f8fafc;
+            width: 48px;
+            padding: 0;
+        }
+
+        /* --- Inputs & Editing --- */
+        input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            outline: none;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        
+        input:hover { background: var(--input-hover); }
+        
+        input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--input-focus-ring);
+            z-index: 2;
+            position: relative;
+        }
+
+        .input-link { color: #2563eb; font-weight: 500; }
+        .input-link:hover { text-decoration: underline; color: #1d4ed8; }
+
+        /* --- Dropdowns / Selects --- */
+        .select-wrapper {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        select {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 6px 28px 6px 14px;
+            border-radius: 9999px; /* Pill shape */
+            border: 1px solid transparent;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            appearance: none; /* Hide default arrow */
+            -webkit-appearance: none;
+            text-align: left;
+            transition: all 0.2s ease;
+            
+            /* Custom minimalist arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.nlm.svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        select:focus { 
+            box-shadow: 0 0 0 3px var(--input-focus-ring); 
+            border-color: var(--primary);
+        }
+        select:hover { filter: brightness(0.97); }
+
+        /* Exact Colors from User's Google Sheet */
+        .color-arrays { background-color: #fce8e6; color: #c5221f; border-color: #fad2cf; }
+        .color-math { background-color: #feefe3; color: #e27200; border-color: #fde2cd; }
+        .color-stack { background-color: #fff8e1; color: #f29900; border-color: #ffefc3; }
+        .color-linked { background-color: #e6f4ea; color: #137333; border-color: #ceead6; }
+        .color-strings { background-color: #e8f0fe; color: #1967d2; border-color: #d2e3fc; }
+        .color-basics { background-color: #f1f3f4; color: #5f6368; border-color: #e8eaed; }
+        
+        .color-solved-no { background-color: #e6f4ea; color: #137333; border-color: #ceead6; }
+        .color-solved-help { background-color: #fef7e0; color: #b06000; border-color: #fef0b3; }
+        .color-unsolved { background-color: #ce1126; color: white; border-color: #a50e1e; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.nlm.svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+
+        .color-revisit-yes { background-color: #e8f0fe; color: #1967d2; border-color: #d2e3fc; }
+        .color-revisit-no { background-color: #e6f4ea; color: #137333; border-color: #ceead6; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="icon-box">
+                <svg xmlns="http://www.w3.nlm.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+            </div>
+            <div class="header-title">
+                <h1>DSA Problem Tracker</h1>
+                <p>Pro HTML/JS Template</p>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="addRow()">
+                <svg xmlns="http://www.w3.nlm.svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                Add Row
+            </button>
+            <button class="btn btn-primary" onclick="exportCSV()">
+                <svg xmlns="http://www.w3.nlm.svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Export CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Area -->
+    <div class="table-container">
+        <div class="table-header-bar">
+            <svg xmlns="http://www.w3.nlm.svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8;"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+            Data Structures & Algorithms
+        </div>
+        <div class="table-scroll">
+            <table id="dsaTable">
+                <thead>
+                    <tr>
+                        <th style="width: 48px"></th>
+                        <th style="min-width: 180px;">Problem Name</th>
+                        <th style="min-width: 200px;">Problem Link</th>
+                        <th style="text-align: center; width: 140px;">Topic</th>
+                        <th style="min-width: 250px;">Idea</th>
+                        <th style="min-width: 200px;">What I did wrong</th>
+                        <th style="text-align: center; width: 180px;">Status</th>
+                        <th style="text-align: center; width: 100px;">Revisit ?</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initial Data State
+    let data = [
+      { id: 1, name: 'Two Sum', link: 'leetcode.com/problems/two-sum', topic: 'Arrays', idea: 'Check pairs using map', wrong: 'Forgot indices', status: 'Solved (No help)', revisit: 'No' },
+      { id: 2, name: 'Palindrome Number', link: 'leetcode.com/problems/palindrome-number', topic: 'Math', idea: 'Reverse number and compare', wrong: 'Negative case missed', status: 'Solved (With help)', revisit: 'Yes' },
+      { id: 3, name: 'Valid Parentheses', link: 'leetcode.com/problems/valid-parentheses', topic: 'Stack', idea: 'Use stack to match', wrong: 'Forgot empty check', status: 'Solved (No help)', revisit: 'No' },
+      { id: 4, name: 'Remove Duplicates', link: 'leetcode.com/problems/remove-duplicates-from-sorted-array', topic: 'Arrays', idea: 'Use two pointers', wrong: 'Index confusion', status: 'Unsolved', revisit: 'Yes' },
+      { id: 5, name: 'Merge Lists', link: 'leetcode.com/problems/merge-two-sorted-lists', topic: 'Linked List', idea: 'Compare and move pointers', wrong: 'Lost next pointer', status: 'Solved (With help)', revisit: 'Yes' },
+      { id: 6, name: 'Maximum Subarray', link: 'leetcode.com/problems/maximum-subarray', topic: 'Arrays', idea: 'Kadane, Keep best sum so far', wrong: 'Reset logic wrong', status: 'Solved (No help)', revisit: 'Yes' },
+      { id: 7, name: 'Contains Duplicate', link: 'leetcode.com/problems/contains-duplicate', topic: 'Arrays', idea: 'Use set to check', wrong: "Didn't know set", status: 'Solved (No help)', revisit: 'No' },
+      { id: 8, name: 'Reverse String', link: 'leetcode.com/problems/reverse-string', topic: 'Strings', idea: 'Swap from both ends', wrong: 'Loop mistake', status: 'Solved (With help)', revisit: 'No' },
+      { id: 9, name: 'Buy & Sell Stock', link: 'leetcode.com/problems/best-time-to-buy-and-sell-stock', topic: 'Arrays', idea: 'Track min price', wrong: 'Wrong comparison', status: 'Solved (With help)', revisit: 'No' },
+      { id: 10, name: 'Fizz Buzz', link: 'leetcode.com/problems/fizz-buzz', topic: 'Basics', idea: 'Check divisibility', wrong: 'Order mistake', status: 'Unsolved', revisit: 'Yes' }
+    ];
+
+    const topics = ['Arrays', 'Math', 'Stack', 'Linked List', 'Strings', 'Basics'];
+    const statuses = ['Solved (No help)', 'Solved (With help)', 'Unsolved'];
+    const revisits = ['Yes', 'No'];
+
+    // Map exact colors based on values
+    const getTopicClass = (topic) => {
+        switch(topic) {
+            case 'Arrays': return 'color-arrays';
+            case 'Math': return 'color-math';
+            case 'Stack': return 'color-stack';
+            case 'Linked List': return 'color-linked';
+            case 'Strings': return 'color-strings';
+            case 'Basics': return 'color-basics';
+            default: return 'color-basics';
+        }
+    };
+
+    const getStatusClass = (status) => {
+        switch(status) {
+            case 'Solved (No help)': return 'color-solved-no';
+            case 'Solved (With help)': return 'color-solved-help';
+            case 'Unsolved': return 'color-unsolved';
+            default: return 'color-basics';
+        }
+    };
+
+    const getRevisitClass = (revisit) => {
+        return revisit === 'Yes' ? 'color-revisit-yes' : 'color-revisit-no';
+    };
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = ''; 
+
+        data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            
+            const topicOptions = topics.map(t => `<option value="${t}" ${row.topic === t ? 'selected' : ''}>${t}</option>`).join('');
+            const statusOptions = statuses.map(s => `<option value="${s}" ${row.status === s ? 'selected' : ''}>${s}</option>`).join('');
+            const revisitOptions = revisits.map(r => `<option value="${r}" ${row.revisit === r ? 'selected' : ''}>${r}</option>`).join('');
+
+            tr.innerHTML = `
+                <td class="cell-number">${index + 1}</td>
+                <td><input type="text" value="${row.name}" onchange="updateData(${row.id}, 'name', this.value)" placeholder="Enter problem..."></td>
+                <td><input type="text" class="input-link" value="${row.link}" onchange="updateData(${row.id}, 'link', this.value)" placeholder="Paste URL..."></td>
+                <td class="select-wrapper">
+                    <select class="${getTopicClass(row.topic)}" style="width: 110px" onchange="updateSelect(${row.id}, 'topic', this.value, this)">
+                        ${topicOptions}
+                    </select>
+                </td>
+                <td><input type="text" value="${row.idea}" onchange="updateData(${row.id}, 'idea', this.value)" placeholder="Core concept..."></td>
+                <td><input type="text" value="${row.wrong}" onchange="updateData(${row.id}, 'wrong', this.value)" placeholder="Mistakes made..."></td>
+                <td class="select-wrapper">
+                    <select class="${getStatusClass(row.status)}" style="width: 155px" onchange="updateSelect(${row.id}, 'status', this.value, this)">
+                        ${statusOptions}
+                    </select>
+                </td>
+                <td class="select-wrapper">
+                    <select class="${getRevisitClass(row.revisit)}" style="width: 75px" onchange="updateSelect(${row.id}, 'revisit', this.value, this)">
+                        ${revisitOptions}
+                    </select>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        // Add a few blank filler rows to make it look like an endless spreadsheet
+        for(let i=0; i<3; i++) {
+             const tr = document.createElement('tr');
+             tr.innerHTML = `<td class="cell-number" style="opacity: 0.5">${data.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+             tbody.appendChild(tr);
+        }
+    }
+
+    function updateData(id, field, value) {
+        const row = data.find(r => r.id === id);
+        if (row) row[field] = value;
+    }
+
+    function updateSelect(id, field, value, element) {
+        updateData(id, field, value);
+        element.className = ''; 
+        if (field === 'topic') element.className = getTopicClass(value);
+        if (field === 'status') element.className = getStatusClass(value);
+        if (field === 'revisit') element.className = getRevisitClass(value);
+    }
+
+    function addRow() {
+        const newId = data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1;
+        data.push({ 
+            id: newId, 
+            name: '', link: '', 
+            topic: 'Arrays', idea: '', wrong: '', 
+            status: 'Unsolved', revisit: 'Yes' 
+        });
+        renderTable();
+        
+        // Auto scroll to the newly added row
+        const scrollContainer = document.querySelector('.table-scroll');
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+
+    function exportCSV() {
+        const headers = ['Problem Name', 'Problem Link', 'Topic', 'Idea', 'What I did wrong', 'Status', 'Revisit ?'];
+        const csvRows = [headers.join(',')];
+        
+        data.forEach(row => {
+            const values = [
+                `"${row.name.replace(/"/g, '""')}"`,
+                `"${row.link.replace(/"/g, '""')}"`,
+                `"${row.topic}"`,
+                `"${row.idea.replace(/"/g, '""')}"`,
+                `"${row.wrong.replace(/"/g, '""')}"`,
+                `"${row.status}"`,
+                `"${row.revisit}"`
+            ];
+            csvRows.push(values.join(','));
+        });
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'DSA_Tracker_Export.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    window.onload = renderTable;
+</script>
+
+</body>
+</html>
