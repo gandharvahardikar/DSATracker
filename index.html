@@ -259,6 +259,13 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         
+        /* Prevent dropdown list from inheriting the active pill's color */
+        select option {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        
         select:focus { 
             box-shadow: 0 0 0 3px var(--input-focus-ring); 
             border-color: var(--primary);
@@ -272,6 +279,7 @@
         .color-linked { background-color: #e6f4ea; color: #137333; border-color: #ceead6; }
         .color-strings { background-color: #e8f0fe; color: #1967d2; border-color: #d2e3fc; }
         .color-basics { background-color: #f1f3f4; color: #5f6368; border-color: #e8eaed; }
+        .color-custom { background-color: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; } /* Purple for user-added topics */
         
         .color-solved-no { background-color: #e6f4ea; color: #137333; border-color: #ceead6; }
         .color-solved-help { background-color: #fef7e0; color: #b06000; border-color: #fef0b3; }
@@ -293,7 +301,7 @@
             </div>
             <div class="header-title">
                 <h1>DSA Problem Tracker</h1>
-                <p>Pro HTML/JS Template</p>
+                <p>Track your progress in Data Structures & Algorithms</p>
             </div>
         </div>
         <div class="btn-group">
@@ -364,7 +372,7 @@
             case 'Linked List': return 'color-linked';
             case 'Strings': return 'color-strings';
             case 'Basics': return 'color-basics';
-            default: return 'color-basics';
+            default: return 'color-custom'; // Applies to manually added topics
         }
     };
 
@@ -388,7 +396,10 @@
         data.forEach((row, index) => {
             const tr = document.createElement('tr');
             
-            const topicOptions = topics.map(t => `<option value="${t}" ${row.topic === t ? 'selected' : ''}>${t}</option>`).join('');
+            // Add a special "Add custom..." option at the end of the topics list
+            const topicOptions = topics.map(t => `<option value="${t}" ${row.topic === t ? 'selected' : ''}>${t}</option>`).join('') + 
+                                 `<option value="__ADD_CUSTOM__" style="font-weight: bold; color: var(--primary);">+ Add new topic...</option>`;
+            
             const statusOptions = statuses.map(s => `<option value="${s}" ${row.status === s ? 'selected' : ''}>${s}</option>`).join('');
             const revisitOptions = revisits.map(r => `<option value="${r}" ${row.revisit === r ? 'selected' : ''}>${r}</option>`).join('');
 
@@ -431,6 +442,22 @@
     }
 
     function updateSelect(id, field, value, element) {
+        // Intercept the custom topic addition
+        if (field === 'topic' && value === '__ADD_CUSTOM__') {
+            const newTopic = prompt("Enter the name of your new topic:");
+            if (newTopic && newTopic.trim() !== '') {
+                const trimmedTopic = newTopic.trim();
+                // Add to global topics list if it doesn't exist yet
+                if (!topics.includes(trimmedTopic)) {
+                    topics.push(trimmedTopic);
+                }
+                updateData(id, field, trimmedTopic);
+            }
+            // Always re-render to either show the new topic, or revert the dropdown if the user clicked cancel
+            renderTable();
+            return;
+        }
+
         updateData(id, field, value);
         element.className = ''; 
         if (field === 'topic') element.className = getTopicClass(value);
